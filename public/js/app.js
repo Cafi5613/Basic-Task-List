@@ -1805,6 +1805,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      sort: {
+        key: '',
+        isAsc: false
+      },
       //入力フォームがaddtextに入る。
       addtext: '',
       // todos 追加要素の見込みがある為{}使用
@@ -1816,22 +1820,39 @@ __webpack_require__.r(__webpack_exports__);
       compTask: []
     };
   },
+  computed: {
+    sortedItems: function sortedItems() {
+      var _this = this;
+
+      var list = this.compTask.slice(); //ソート時でdataの順序を書き換えないため
+
+      if (this.sort.key) {
+        list.sort(function (a, b) {
+          a = a[_this.sort.key];
+          b = b[_this.sort.key];
+          return (a === b ? 0 : a > b ? 1 : -1) * (_this.sort.isAsc ? 1 : -1);
+        });
+      }
+
+      return list;
+    }
+  },
   methods: {
     //validateにエラーがない場合 todosへ追加後　addtextを空にする。その後、ローカルストレージに保存
     addToDo: function addToDo() {
-      var _this = this;
+      var _this2 = this;
 
       //注！！アロー関数(引数)=>{処理}
       this.$validator.validateAll().then(function (result) {
         if (result) {
-          if (_this.addtext) {
-            _this.todos.push({
-              text: _this.addtext
+          if (_this2.addtext) {
+            _this2.todos.push({
+              text: _this2.addtext
             });
 
-            _this.addtext = '';
+            _this2.addtext = '';
 
-            _this.saveTodo();
+            _this2.saveTodo();
           }
         }
       });
@@ -1847,6 +1868,15 @@ __webpack_require__.r(__webpack_exports__);
       console.log(todo.time);
       this.compTask.push(todo);
       this.todos.splice(this.todos.indexOf(todo), 1);
+    },
+    //ソート機能
+    sortedClass: function sortedClass(key) {
+      return this.sort.key === key ? "sorted ".concat(this.sort.isAsc ? 'asc' : 'desc') : '';
+    },
+    //ソート機能
+    sortBy: function sortBy(key) {
+      this.sort.isAsc = this.sort.key === key ? !this.sort.isAsc : false;
+      this.sort.key = key;
     },
     //localStorage に保存　（オブジェクトや配列はそのままJSONで扱えないので、stringifyでエンコードする。）
     saveTodo: function saveTodo() {
@@ -48436,11 +48466,35 @@ var render = function() {
         _vm._v(" "),
         _c("div", { staticClass: "panel-body" }, [
           _c("table", { staticClass: "table table-striped task-table" }, [
-            _vm._m(1),
+            _c("thead", [
+              _c(
+                "th",
+                {
+                  on: {
+                    click: function($event) {
+                      return _vm.sortBy("time")
+                    }
+                  }
+                },
+                [_vm._v("time")]
+              ),
+              _vm._v(" "),
+              _c(
+                "th",
+                {
+                  on: {
+                    click: function($event) {
+                      return _vm.sortBy("text")
+                    }
+                  }
+                },
+                [_vm._v("task")]
+              )
+            ]),
             _vm._v(" "),
             _c(
               "tbody",
-              _vm._l(_vm.compTask, function(item) {
+              _vm._l(_vm.sortedItems, function(item) {
                 return _c("tr", [
                   _c("td", { staticClass: "table-text" }, [
                     _vm._v(_vm._s(item.time))
@@ -48450,7 +48504,7 @@ var render = function() {
                     _vm._v(_vm._s(item.text))
                   ]),
                   _vm._v(" "),
-                  _vm._m(2, true)
+                  _vm._m(1, true)
                 ])
               }),
               0
@@ -48470,16 +48524,6 @@ var staticRenderFns = [
       _c("th", [_vm._v("Task")]),
       _vm._v(" "),
       _c("th", [_vm._v(" ")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("th", [_vm._v("time")]),
-      _vm._v(" "),
-      _c("th", [_vm._v("task")])
     ])
   },
   function() {

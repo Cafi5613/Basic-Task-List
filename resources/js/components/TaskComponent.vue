@@ -78,13 +78,13 @@
       <div class="panel-body">
         <table class="table table-striped task-table">
           <thead>
-            <th>time</th>
-            <th>task</th>
+            <th @click="sortBy('time')">time</th>
+            <th @click="sortBy('text')">task</th>
           </thead>
           <tbody>
             
             <!--追加したToDoをforで回す -->
-            <tr v-for="item in compTask">
+            <tr v-for="item in sortedItems">
               <td class="table-text">{{item.time}}</td>
               <td class="table-text">{{item.text}}</td>
               <!-- Task Delete Button ()履歴から削除する。-->
@@ -107,6 +107,10 @@
 export default {
   data: function() {
                     return {
+                      sort: {
+                        key: '',
+                        isAsc: false
+                      },
                             //入力フォームがaddtextに入る。
                             addtext:'',
                             // todos 追加要素の見込みがある為{}使用
@@ -117,6 +121,20 @@ export default {
                             compTask:[],
                           }
                     },
+  computed: {
+    sortedItems () {
+                    const list = this.compTask.slice();  
+                    //ソート時でdataの順序を書き換えないため
+                    if (this.sort.key) {
+                      list.sort((a, b) => {
+                        a = a[this.sort.key]
+                        b = b[this.sort.key]
+                        return (a === b ? 0 : a > b ? 1 : -1) * (this.sort.isAsc ? 1 : -1)
+                          });
+                        }
+                        return list;
+                      }
+            },
   methods: {
     //validateにエラーがない場合 todosへ追加後　addtextを空にする。その後、ローカルストレージに保存
     addToDo: function() {
@@ -143,6 +161,16 @@ export default {
                          this.compTask.push(todo);
                          this.todos.splice(this.todos.indexOf(todo),1);
                         },
+    //ソート機能
+    sortedClass (key) {
+                      return this.sort.key === key ? `sorted ${this.sort.isAsc ? 'asc' : 'desc' }` : '';
+                      },
+    //ソート機能
+    sortBy (key) {
+                  this.sort.isAsc = this.sort.key === key ? !this.sort.isAsc : false;
+                  this.sort.key = key;
+                  },
+
                     //localStorage に保存　（オブジェクトや配列はそのままJSONで扱えないので、stringifyでエンコードする。）
     saveTodo: function(){
                         localStorage.setItem('todos', JSON.stringify(this.todos));
