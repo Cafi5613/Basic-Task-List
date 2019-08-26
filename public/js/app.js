@@ -1772,6 +1772,36 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -1782,7 +1812,8 @@ __webpack_require__.r(__webpack_exports__);
         text: 'AM会議'
       }, {
         text: '見積書提出'
-      }]
+      }],
+      compTask: []
     };
   },
   methods: {
@@ -1806,9 +1837,16 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     //todo で回した dodosを削除する。その後、ローカルストレージに保存
-    removeToDo: function removeToDo(todo) {
+    //removeToDo: function(todo) {
+    // this.todos.splice(this.todos.indexOf(todo),1);
+    // this.saveTodo();
+    // },
+    //todos 完了したタスクをitemsに配置する。                           
+    cleanToDo: function cleanToDo(todo) {
+      todo.time = moment(new Date()).format('YYYY/MM/DD HH:mm');
+      console.log(todo.time);
+      this.compTask.push(todo);
       this.todos.splice(this.todos.indexOf(todo), 1);
-      this.saveTodo();
     },
     //localStorage に保存　（オブジェクトや配列はそのままJSONで扱えないので、stringifyでエンコードする。）
     saveTodo: function saveTodo() {
@@ -48277,9 +48315,7 @@ var render = function() {
               _c("br"),
               _c("br"),
               _vm._v(" "),
-              _c("ul", [
-                _c("li", [_vm._v("@" + _vm._s(_vm.errors.first("text")))])
-              ])
+              _c("ul", [_c("li", [_vm._v(_vm._s(_vm.errors.first("text")))])])
             ]
           ),
           _vm._v(" "),
@@ -48363,7 +48399,7 @@ var render = function() {
               _vm._l(_vm.todos, function(todo) {
                 return _c("tr", [
                   _c("td", { staticClass: "table-text" }, [
-                    _vm._v("@" + _vm._s(todo.text))
+                    _vm._v(_vm._s(todo.text))
                   ]),
                   _vm._v(" "),
                   _c("td", [
@@ -48371,10 +48407,11 @@ var render = function() {
                       "button",
                       {
                         staticClass: "btn btn-danger",
+                        staticStyle: { float: "right" },
                         attrs: { type: "submit" },
                         on: {
                           click: function($event) {
-                            return _vm.removeToDo(todo)
+                            return _vm.cleanToDo(todo)
                           }
                         }
                       },
@@ -48384,6 +48421,36 @@ var render = function() {
                       ]
                     )
                   ])
+                ])
+              }),
+              0
+            )
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "panel panel-default" }, [
+        _c("div", { staticClass: "panel-heading" }, [
+          _vm._v("\n        Crea Tasks\n      ")
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "panel-body" }, [
+          _c("table", { staticClass: "table table-striped task-table" }, [
+            _vm._m(1),
+            _vm._v(" "),
+            _c(
+              "tbody",
+              _vm._l(_vm.compTask, function(item) {
+                return _c("tr", [
+                  _c("td", { staticClass: "table-text" }, [
+                    _vm._v(_vm._s(item.time))
+                  ]),
+                  _vm._v(" "),
+                  _c("td", { staticClass: "table-text" }, [
+                    _vm._v(_vm._s(item.text))
+                  ]),
+                  _vm._v(" "),
+                  _vm._m(2, true)
                 ])
               }),
               0
@@ -48403,6 +48470,35 @@ var staticRenderFns = [
       _c("th", [_vm._v("Task")]),
       _vm._v(" "),
       _c("th", [_vm._v(" ")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("th", [_vm._v("time")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("task")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-danger",
+          staticStyle: { float: "right" },
+          attrs: { type: "submit" }
+        },
+        [
+          _c("i", { staticClass: "fa fa-btn fa-trash" }),
+          _vm._v("Delete\n                ")
+        ]
+      )
     ])
   }
 ]

@@ -15,7 +15,7 @@
           <strong>Whoops! Something went wrong!</strong>
           <br><br>
           <ul>
-            <li>@{{ errors.first('text') }}</li>
+            <li>{{ errors.first('text') }}</li>
           </ul>
         </div>
 
@@ -56,11 +56,11 @@
             
             <!--追加したToDoをforで回す -->
             <tr v-for="todo in todos">
-              <td class="table-text">@{{todo.text}}</td>
+              <td class="table-text">{{todo.text}}</td>
 
-              <!-- Task Delete Button (removeToDo)で削除-->
+              <!-- Task Delete Button (rcleanToDo)で完了済のitemsに入れる-->
               <td>
-                <button v-on:click="removeToDo(todo)" type="submit" class="btn btn-danger">
+                <button v-on:click="cleanToDo(todo)" type="submit" class="btn btn-danger" style="float: right;">
                   <i class="fa fa-btn fa-trash"></i>Delete
                 </button>
               </td>
@@ -69,6 +69,36 @@
         </table>
       </div>
     </div>
+
+    <!-- Crea Tasks -->
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Crea Tasks
+      </div>
+      <div class="panel-body">
+        <table class="table table-striped task-table">
+          <thead>
+            <th>time</th>
+            <th>task</th>
+          </thead>
+          <tbody>
+            
+            <!--追加したToDoをforで回す -->
+            <tr v-for="item in compTask">
+              <td class="table-text">{{item.time}}</td>
+              <td class="table-text">{{item.text}}</td>
+              <!-- Task Delete Button ()履歴から削除する。-->
+              <td>
+                <button type="submit" class="btn btn-danger" style="float: right;">
+                  <i class="fa fa-btn fa-trash"></i>Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 </div>
 </template>
@@ -83,28 +113,36 @@ export default {
                             todos: [
                                     {text:'AM会議'},
                                   {text:'見積書提出'}
-                                    ]
-                            }
+                                    ],
+                            compTask:[],
+                          }
                     },
   methods: {
     //validateにエラーがない場合 todosへ追加後　addtextを空にする。その後、ローカルストレージに保存
     addToDo: function() {
-    //注！！アロー関数(引数)=>{処理}
-    this.$validator.validateAll().then((result) => {
-      if (result) {
-        if (this.addtext) {
+                        //注！！アロー関数(引数)=>{処理}
+                        this.$validator.validateAll().then((result) => {
+                        if (result) {
+                        if (this.addtext) {
                             this.todos.push({ text:this.addtext});
                             this.addtext = '';
                             this.saveTodo();
-                          }
-                        }
-                      })
-                    },
+                                          }
+                                    }
+                          })
+                        },
     //todo で回した dodosを削除する。その後、ローカルストレージに保存
-    removeToDo: function(todo) {
-                                this.todos.splice(this.todos.indexOf(todo),1);
-                                this.saveTodo();
-                                },
+    //removeToDo: function(todo) {
+                               // this.todos.splice(this.todos.indexOf(todo),1);
+                               // this.saveTodo();
+                               // },
+    //todos 完了したタスクをitemsに配置する。                           
+    cleanToDo: function(todo) {
+                         todo.time = moment(new Date).format('YYYY/MM/DD HH:mm');
+                         console.log(todo.time);
+                         this.compTask.push(todo);
+                         this.todos.splice(this.todos.indexOf(todo),1);
+                        },
                     //localStorage に保存　（オブジェクトや配列はそのままJSONで扱えないので、stringifyでエンコードする。）
     saveTodo: function(){
                         localStorage.setItem('todos', JSON.stringify(this.todos));
@@ -118,7 +156,7 @@ export default {
                 }
             },
             //プラウザで開いた時にloadTodoしてロードするようにする。
-  mounted: function(){
+    mounted: function(){
                     this.loadTodo();
                     },
                   }
