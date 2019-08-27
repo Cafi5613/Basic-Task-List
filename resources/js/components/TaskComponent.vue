@@ -1,7 +1,19 @@
 <template>
   <div id="app" class="container">
    <div class="col-sm-offset-2 col-sm-8">
-    <div class="panel panel-default">
+
+    <!-- クリック後　New Task 表示 -->
+    <button v-on:click="openDiv()" type="submit" class="btn btn-danger" style="background-color:#f5f5f5; margin-bottom: 2vh; color: black; border-color:#dcdcdc;">
+                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>New Task
+    </button>
+
+    <!-- クリック後　Deleted task 表示 -->
+    <button v-on:click="closeDiv()" type="submit" class="btn btn-danger" style="margin-bottom: 2vh;">
+                  <i class="fa fa-btn fa-trash"></i>Deleted Task
+    </button>
+
+    <!-- New Task  -->
+    <div class="panel panel-default" v-if="open==true">
       <div class="panel-heading">
        New Task
       </div>
@@ -41,8 +53,54 @@
       </div>
     </div>
 
-    <!-- Current Tasks -->
-    <div class="panel panel-default">
+    <!-- Seach task -->
+    <div class="panel panel-default" v-if="open==false">
+      <div class="panel-heading">
+       Seach Task
+      </div>
+      <div class="panel-body">
+
+        <!-- Display Validation Errors -->
+
+        <!-- Form Error List -->
+        <!-- text Validate error 発生時表示-->
+        <div class="alert alert-danger" v-show="errors.has('text')">
+          <strong>Whoops! Something went wrong!</strong>
+          <br><br>
+          <ul>
+            <li>{{ errors.first('text') }}</li>
+          </ul>
+        </div>
+
+        <!-- SeachTask Form -->
+        <!--   -->
+        <div class="form-group">
+          <label for="task-name" class="col-sm-3 control-label">Task</label>
+          <div class="col-sm-6">
+            <!-- validate(255字以内) -->
+            <!-- seachするkeywordを指定 -->
+            <input type="text" v-model.trim="keyword" placeholder="keyword" name="text" v-validate="'max:255'"  class="form-control">
+             <!-- seachするselectionを指定 -->
+            <input type="text" v-model.trim="selection" placeholder="selection" name="text" v-validate="'max:255'"  class="form-control">
+          </div>
+        </div>
+
+        <!-- Add Task Button -->
+        <div class="form-group">
+          <div class="col-sm-offset-3 col-sm-6">
+            <!-- seach の開始　... メソットがまだ作れていないので後から...取り合いずボタンだけ -->
+            <button type="submit" class="btn btn-default" style="margin-top:10px;">
+              <i class="fa fa-search" aria-hidden="true">Seach Task</i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!--Current Tasks -->
+    <div class="panel panel-default" v-if="open==true">
       <div class="panel-heading">
         Current Tasks
       </div>
@@ -70,29 +128,26 @@
       </div>
     </div>
 
-    <!-- Crea Tasks -->
-    <div class="panel panel-default">
+    <!-- Deleted Tasks -->
+    <div class="panel panel-default" v-if="open==false">
       <div class="panel-heading">
-        Crea Tasks
+        Deleted task
       </div>
       <div class="panel-body">
         <table class="table table-striped task-table">
           <thead>
-            <th @click="sortBy('time')">time</th>
-            <th @click="sortBy('text')">task</th>
+            <th @click="sortBy('text')">Task</th>
+            <th>&nbsp;</th>
+            <th @click="sortBy('time')">Time</th>
           </thead>
           <tbody>
             
             <!--追加したToDoをforで回す -->
             <tr v-for="item in sortedItems">
-              <td class="table-text">{{item.time}}</td>
               <td class="table-text">{{item.text}}</td>
-              <!-- Task Delete Button ()履歴から削除する。-->
-              <td>
-                <button type="submit" class="btn btn-danger" style="float: right;">
-                  <i class="fa fa-btn fa-trash"></i>Delete
-                </button>
-              </td>
+              <td>&nbsp;</td>
+              <td class="table-text"><i class="fa fa-clock-o" aria-hidden="true"></i>{{item.time}}</td>
+              
             </tr>
           </tbody>
         </table>
@@ -101,12 +156,20 @@
 
   </div>
 </div>
+
 </template>
 
 <script>
 export default {
   data: function() {
                     return {
+                      //タスク履歴とタスク追加ページの表示切り替え
+                      open: true,
+                      //searchするカテゴリ
+                      selection: '',
+                      //searchする文字列
+                      keyword: '',
+                      //ソートするアイテム
                       sort: {
                         key: '',
                         isAsc: false
@@ -123,7 +186,8 @@ export default {
                     },
   computed: {
     sortedItems () {
-                    const list = this.compTask.slice();  
+                    var item= this.findBy(this.compTask, this.keyword, this.selection);
+                    const list = item.slice();  // ソート時でdataの順序を書き換えないため 
                     //ソート時でdataの順序を書き換えないため
                     if (this.sort.key) {
                       list.sort((a, b) => {
@@ -170,7 +234,21 @@ export default {
                   this.sort.isAsc = this.sort.key === key ? !this.sort.isAsc : false;
                   this.sort.key = key;
                   },
+    //検索機能
+    findBy: function (list, value, column) {
+                                           return list.filter(function (item) {
+                                          // 入力がない場合は全件表示
+                                          return (item[column] == value || value === '')
+                                            })
+                    },
+    //表示の切り替え
+    openDiv:function(){
+                  this.open = true ;
+                  },
+    closeDiv:function(){
+                  this.open = false ;
 
+                        },
                     //localStorage に保存　（オブジェクトや配列はそのままJSONで扱えないので、stringifyでエンコードする。）
     saveTodo: function(){
                         localStorage.setItem('todos', JSON.stringify(this.todos));
