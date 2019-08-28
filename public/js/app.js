@@ -1857,7 +1857,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -1889,7 +1888,6 @@ __webpack_require__.r(__webpack_exports__);
 
       var item = this.findBy(this.compTask, this.keyword, this.selection);
       var list = item.slice(); // ソート時でdataの順序を書き換えないため 
-      //ソート時でdataの順序を書き換えないため
 
       if (this.sort.key) {
         list.sort(function (a, b) {
@@ -1922,17 +1920,12 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
-    //todo で回した dodosを削除する。その後、ローカルストレージに保存
-    //removeToDo: function(todo) {
-    // this.todos.splice(this.todos.indexOf(todo),1);
-    // this.saveTodo();
-    // },
-    //todos 完了したタスクをitemsに配置する。                           
     cleanToDo: function cleanToDo(todo) {
       todo.time = moment(new Date()).format('YYYY/MM/DD HH:mm');
-      console.log(todo.time);
       this.compTask.push(todo);
       this.todos.splice(this.todos.indexOf(todo), 1);
+      this.saveCompTask();
+      this.saveTodo();
     },
     //ソート機能
     sortedClass: function sortedClass(key) {
@@ -1961,6 +1954,9 @@ __webpack_require__.r(__webpack_exports__);
     saveTodo: function saveTodo() {
       localStorage.setItem('todos', JSON.stringify(this.todos));
     },
+    saveCompTask: function saveCompTask() {
+      localStorage.setItem('compTask', JSON.stringify(this.compTask));
+    },
     //localStorageから　ロードする。前回とは逆にJSONから、parseでデコードする。
     loadTodo: function loadTodo() {
       this.todos = JSON.parse(localStorage.getItem('todos'));
@@ -1968,11 +1964,23 @@ __webpack_require__.r(__webpack_exports__);
       if (!this.todos) {
         this.todos = [];
       }
+    },
+    resetCompTask: function resetCompTask() {
+      localStorage.removeItem('compTask');
+      this.loadCompTask();
+    },
+    loadCompTask: function loadCompTask() {
+      this.compTask = JSON.parse(localStorage.getItem('compTask'));
+
+      if (!this.compTask) {
+        this.compTask = [];
+      }
     }
   },
   //プラウザで開いた時にloadTodoしてロードするようにする。
   mounted: function mounted() {
     this.loadTodo();
+    this.loadCompTask();
   }
 });
 
@@ -48421,7 +48429,7 @@ var render = function() {
             staticClass: "fa fa-pencil-square-o",
             attrs: { "aria-hidden": "true" }
           }),
-          _vm._v("New Task\n    ")
+          _vm._v(" New Task\n            ")
         ]
       ),
       _vm._v(" "),
@@ -48439,14 +48447,14 @@ var render = function() {
         },
         [
           _c("i", { staticClass: "fa fa-btn fa-trash" }),
-          _vm._v("Deleted task\n    ")
+          _vm._v("Deleted Task\n            ")
         ]
       ),
       _vm._v(" "),
       _vm.open == true
         ? _c("div", { staticClass: "panel panel-default" }, [
             _c("div", { staticClass: "panel-heading" }, [
-              _vm._v("\n       New Task\n      ")
+              _vm._v("\n                    New Task\n                ")
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "panel-body" }, [
@@ -48545,7 +48553,7 @@ var render = function() {
       _vm.open == false
         ? _c("div", { staticClass: "panel panel-default" }, [
             _c("div", { staticClass: "panel-heading" }, [
-              _vm._v("\n       Seach Task\n      ")
+              _vm._v("\n                    Seach Task\n                ")
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "panel-body" }, [
@@ -48667,7 +48675,7 @@ var render = function() {
       _vm.open == true
         ? _c("div", { staticClass: "panel panel-default" }, [
             _c("div", { staticClass: "panel-heading" }, [
-              _vm._v("\n        Current Tasks\n      ")
+              _vm._v("\n                    Current Tasks\n                ")
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "panel-body" }, [
@@ -48697,7 +48705,9 @@ var render = function() {
                           },
                           [
                             _c("i", { staticClass: "fa fa-btn fa-trash" }),
-                            _vm._v("Delete\n                ")
+                            _vm._v(
+                              "Delete\n                                    "
+                            )
                           ]
                         )
                       ])
@@ -48713,7 +48723,7 @@ var render = function() {
       _vm.open == false
         ? _c("div", { staticClass: "panel panel-default" }, [
             _c("div", { staticClass: "panel-heading" }, [
-              _vm._v("\n        Deleted task\n      ")
+              _vm._v("\n                    Deleted task\n                ")
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "panel-body" }, [
