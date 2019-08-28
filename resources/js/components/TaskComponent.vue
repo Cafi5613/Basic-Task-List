@@ -1,168 +1,163 @@
 <template>
   <div id="app" class="container">
-          <div class="col-sm-offset-2 col-sm-8">
+    <div class="col-sm-offset-2 col-sm-8">
 
-              <!-- クリック後　New Task 表示 -->
-              <button v-on:click="openDiv()" type="submit" class="btn btn-danger" style="background-color:#f5f5f5; margin-bottom: 2vh; color: black; border-color:#dcdcdc;">
-                  <i class="fa fa-pencil-square-o" aria-hidden="true"></i> New Task
-              </button>
+      <!-- クリック後　New Task 表示 -->
+      <button v-on:click="openDiv()" type="submit" class="btn btn-danger" style="background-color:#f5f5f5; margin-bottom: 2vh; color: black; border-color:#dcdcdc;">
+        <i class="fa fa-pencil-square-o" aria-hidden="true"></i> New Task
+      </button>
 
-              <!-- クリック後　Deleted task 表示 -->
-              <button v-on:click="closeDiv()" type="submit" class="btn btn-danger" style="margin-bottom: 2vh;">
-                  <i class="fa fa-btn fa-trash"></i>Deleted Task
-              </button>
+      <!-- クリック後　Deleted task 表示 -->
+      <button v-on:click="closeDiv()" type="submit" class="btn btn-danger" style="margin-bottom: 2vh; background-color:#E0E0E0; color: black; border-color: #dcdcdc;">
+        <i class="fa fa-btn fa-trash"></i>Deleted Task
+      </button>
 
-              <!-- New Task  -->
-              <div class="panel panel-default" v-if="open==true">
-                  <div class="panel-heading">
-                      New Task
-                  </div>
-                  <div class="panel-body">
+      <!-- New Task  -->
+      <div class="panel panel-default" v-if="open==true">
+        <div class="panel-heading">
+          New Task
+        </div>
+        <div class="panel-body">
 
-                      <!-- Display Validation Errors -->
-                      <!-- Form Error List -->
-                      <!-- text Validate error 発生時表示-->
-                      <div class="alert alert-danger" v-show="errors.has('text')">
-                          <strong>Whoops! Something went wrong!</strong>
-                          <br><br>
-                          <ul>
-                              <li>{{ errors.first('text') }}</li>
-                          </ul>
-                      </div>
+          <!-- Display Validation Errors -->
 
-                      <!-- New Task Form -->
-                      <!-- Task Name -->
-                      <div class="form-group">
-                          <label for="task-name" class="col-sm-3 control-label">Task</label>
-                          <div class="col-sm-6">
-                              <!-- validate(255字以内) required は入力時以外は、addtextが通らないので指定しない。 -->
-                              <input type="text" v-model.trim="addtext" placeholder="To do" name="text" v-validate="'max:255'"  class="form-control">
-                          </div>
-                      </div>
-
-                      <!-- Add Task Button -->
-                      <div class="form-group">
-                          <div class="col-sm-offset-3 col-sm-6">
-                              <!-- タスクの追加 (addToDo) -->
-                              <button v-on:click="addToDo" type="submit" class="btn btn-default" style="margin-top:10px;">
-                                  <i class="fa fa-btn fa-plus">Add Task</i>
-                              </button>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-              <!-- Seach task -->
-              <div class="panel panel-default" v-if="open==false">
-                  <div class="panel-heading">
-                      Seach Task
-                  </div>
-                  <div class="panel-body">
-
-                      <!-- Display Validation Errors -->
-
-                      <!-- Form Error List -->
-                      <!-- keyword Validate error 発生時表示-->
-                      <div class="alert alert-danger" v-show="errors.has('keyword')">
-                          <strong>Whoops! Something went wrong!</strong>
-                          <br><br>
-                          <ul>
-                              <li>{{ errors.first('text') }}</li>
-                          </ul>
-                      </div>
-                      <!-- selection Validate error 発生時表示-->
-                      <div class="alert alert-danger" v-show="errors.has('selection')">
-                          <strong>Whoops! Something went wrong!</strong>
-                          <br><br>
-                          <ul>
-                              <li>{{ errors.first('text') }}</li>
-                          </ul>
-                      </div>
-
-                      <!-- SeachTask Form -->
-                      <!--   -->
-                      <div class="form-group">
-                          <label for="task-name" class="col-sm-3 control-label">Task</label>
-                          <div class="col-sm-6">
-                              <!-- validate(255字以内) -->
-                              <!-- seachするkeywordを指定 -->
-                              <input type="text" v-model.trim="keyword" placeholder="keyword" name="text" v-validate="'max:255'"  class="form-control">
-                              <!-- seachするselectionを指定 -->
-                              <input type="text" v-model.trim="selection" placeholder="selection" name="text" v-validate="'max:255'"  class="form-control">
-                          </div>
-                      </div>
-
-                      <!-- Add Task Button -->
-                      <div class="form-group">
-                          <div class="col-sm-offset-3 col-sm-6">
-                              <!-- seach の開始　... メソットがまだ作れていないので後から...取り合いずボタンだけ -->
-                              <button type="submit" class="btn btn-default" style="margin-top:10px;">
-                                  <i class="fa fa-search" aria-hidden="true">Seach Task</i>
-                              </button>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-
-
-              <!--Current Tasks -->
-              <div class="panel panel-default" v-if="open==true">
-                  <div class="panel-heading">
-                      Current Tasks
-                  </div>
-                  <div class="panel-body">
-                      <table class="table table-striped task-table">
-                          <thead>
-                              <th>Task</th>
-                              <th>&nbsp;</th>
-                          </thead>
-                          <tbody>
-
-                              <!--追加したToDoをforで回す -->
-                              <tr v-for="todo in todos">
-                                  <td class="table-text">{{todo.text}}</td>
-
-                                  <!-- Task Delete Button (rcleanToDo)で完了済のitemsに入れる-->
-                                  <td>
-                                      <button v-on:click="cleanToDo(todo)" type="submit" class="btn btn-danger" style="float: right;">
-                                          <i class="fa fa-btn fa-trash"></i>Delete
-                                      </button>
-                                  </td>
-                              </tr>
-                          </tbody>
-                      </table>
-                  </div>
-              </div>
-
-              <!-- Deleted Tasks -->
-              <div class="panel panel-default" v-if="open==false">
-                  <div class="panel-heading">
-                      Deleted task
-                  </div>
-                  <div class="panel-body">
-                      <table class="table table-striped task-table">
-                          <thead>
-                              <th @click="sortBy('text')">Task</th>
-                              <th>&nbsp;</th>
-                              <th @click="sortBy('time')">Time</th>
-                          </thead>
-                          <tbody>
-
-                              <!--追加したToDoをforで回す -->
-                              <tr v-for="item in sortedItems">
-                                  <td class="table-text">{{item.text}}</td>
-                                  <td>&nbsp;</td>
-                                  <td class="table-text"><i class="fa fa-clock-o" aria-hidden="true"></i>{{item.time}}</td>
-
-                              </tr>
-                          </tbody>
-                      </table>
-                  </div>
-              </div>
-
+          <!-- Form Error List -->
+          <!-- text Validate error 発生時表示-->
+          <div class="alert alert-danger" v-show="errors.has('text')">
+            <strong>Whoops! Something went wrong!</strong>
+            <br><br>
+            <ul>
+              <li>{{ errors.first('text') }}</li>
+            </ul>
           </div>
+
+          <!-- New Task Form -->
+          <!-- Task Name -->
+          <div class="form-group">
+            <label for="task-name" class="col-sm-3 control-label">Task</label>
+            <div class="col-sm-6">
+              <!-- validate(255字以内) required は入力時以外は、addtextが通らないので指定しない。 -->
+              <input type="text" v-model.trim="addtext" placeholder="To do" name="text" v-validate="'max:255'"  class="form-control">
+            </div>
+          </div>
+
+          <!-- Add Task Button -->
+          <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-6">
+              <!-- タスクの追加 (addToDo) -->
+              <button v-on:click="addToDo" type="submit" class="btn btn-default" style="margin-top:10px;">
+                <i class="fa fa-btn fa-plus">Add Task</i>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- Seach task -->
+      <div class="panel panel-default" v-if="open==false">
+        <div class="panel-heading" style="background-color:#E0E0E0;">
+          Seach Task
+        </div>
+        <div class="panel-body">
+
+          <!-- Display Validation Errors -->
+
+          <!-- Form Error List -->
+          <!-- text Validate error 発生時表示-->
+          <div class="alert alert-danger" v-show="errors.has('text')">
+            <strong>Whoops! Something went wrong!</strong>
+            <br><br>
+            <ul>
+              <li>{{ errors.first('text') }}</li>
+            </ul>
+          </div>
+
+          <!-- SeachTask Form -->
+          <!--   -->
+          <div class="form-group">
+            <label for="task-name" class="col-sm-3 control-label">Selection&nbsp;&nbsp;:&nbsp;&nbsp;<select name="selection" v-model.trim="selection" placeholder="keyword" >
+              <option value="text">Task</option>
+              <option value="time">Time</option>
+            </select></label>
+            <div class="col-sm-6">
+              <!-- validate(255字以内) -->
+              <!-- seachするkeywordを指定 -->
+              <input type="text" v-if ="selection == 'text' " v-model.trim="seachText" placeholder="keyword" name="text" v-validate="'max:255'"  class="form-control">
+              <input type="date" v-if ="selection == 'time' " v-model.trim="seachText" placeholder="keyword" name="text" v-validate="'max:255'"  class="form-control">
+            </div>
+          </div>
+
+          <!-- Add Task Button -->
+          <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-6">
+              <!-- seach の開始　... メソットがまだ作れていないので後から...取り合いずボタンだけ -->
+              <button type="submit" class="btn btn-default" v-on:click="seachTodo" style="margin-top:10px;">
+                <i class="fa fa-search" aria-hidden="true">Seach Task</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!--Current Tasks -->
+      <div class="panel panel-default" v-if="open==true">
+        <div class="panel-heading">
+          Current Tasks
+        </div>
+        <div class="panel-body">
+          <table class="table table-striped task-table">
+            <thead>
+              <th>Task</th>
+              <th>&nbsp;</th>
+            </thead>
+            <tbody>
+
+              <!--追加したToDoをforで回す -->
+              <tr v-for="todo in todos">
+                <td class="table-text">{{todo.text}}</td>
+
+                <!-- Task Delete Button (rcleanToDo)で完了済のitemsに入れる-->
+                <td>
+                  <button v-on:click="cleanToDo(todo)" type="submit" class="btn btn-danger" style="float: right;">
+                    <i class="fa fa-btn fa-trash"></i>Delete
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Deleted Tasks -->
+      <div class="panel panel-default" v-if="open==false">
+        <div class="panel-heading" style="background-color:#E0E0E0;">
+          Deleted task
+        </div>
+        <div class="panel-body">
+          <table class="table table-striped task-table">
+            <thead>
+              <th @click="sortBy('text')">Task</th>
+              <th>&nbsp;</th>
+              <th @click="sortBy('time')">Time</th>
+            </thead>
+            <tbody>
+
+              <!--追加したToDoをforで回す -->
+              <tr v-for="item in sortedItems">
+                <td class="table-text">{{item.text}}</td>
+                <td>&nbsp;</td>
+                <td class="table-text"><i class="fa fa-clock-o" aria-hidden="true"></i>{{item.time}}</td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </template>
 
 <script>
@@ -172,9 +167,11 @@
         //タスク履歴とタスク追加ページの表示切り替え
         open: true,
         //searchするカテゴリ
-        selection: '',
+        selection: 'text',
         //searchする文字列
         keyword: '',
+        //ソートするアイテム
+        seachText:'',
         //ソートするアイテム
         sort: {
           key: '',
@@ -225,6 +222,17 @@
         this.saveCompTask();
         this.saveTodo();
       },
+      seachTodo:function(){
+        if(this.selection == 'time'){
+          // input deteの中身が YYYY-MM-DD なので、YYYY/MM/DD に置換する！！正規表現
+          this.keyword = this.seachText.replace(/-/g, '/');
+          this.seachText = '';
+          this,selection = 'text' ;
+        }else{
+          this.keyword = this.seachText;
+          this.seachText = '';
+        }
+      },
       //ソート機能
       sortedClass (key) {
         return this.sort.key === key ? `sorted ${this.sort.isAsc ? 'asc' : 'desc' }` : '';
@@ -238,9 +246,9 @@
       findBy: function (list, value, column) {
         return list.filter(function (item) {
           // 入力がない場合は全件表示
-          return (item[column] == value || value === '')
-        })
-      },
+          return (item[column].indexOf(value) > -1  || value === '')
+         })
+        },
       //表示の切り替え
       openDiv:function(){
         this.open = true ;
@@ -280,5 +288,5 @@
       this.loadTodo();
       this.loadCompTask();
     }
-  },
+  }
 </script>

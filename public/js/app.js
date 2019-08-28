@@ -1857,15 +1857,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       //タスク履歴とタスク追加ページの表示切り替え
       open: true,
       //searchするカテゴリ
-      selection: '',
+      selection: 'text',
       //searchする文字列
       keyword: '',
+      //ソートするアイテム
+      seachText: '',
       //ソートするアイテム
       sort: {
         key: '',
@@ -1927,6 +1931,17 @@ __webpack_require__.r(__webpack_exports__);
       this.saveCompTask();
       this.saveTodo();
     },
+    seachTodo: function seachTodo() {
+      if (this.selection == 'time') {
+        // input deteの中身が YYYY-MM-DD なので、YYYY/MM/DD に置換する！！正規表現
+        this.keyword = this.seachText.replace(/-/g, '/');
+        this.seachText = '';
+        this, selection = 'text';
+      } else {
+        this.keyword = this.seachText;
+        this.seachText = '';
+      }
+    },
     //ソート機能
     sortedClass: function sortedClass(key) {
       return this.sort.key === key ? "sorted ".concat(this.sort.isAsc ? 'asc' : 'desc') : '';
@@ -1940,7 +1955,7 @@ __webpack_require__.r(__webpack_exports__);
     findBy: function findBy(list, value, column) {
       return list.filter(function (item) {
         // 入力がない場合は全件表示
-        return item[column] == value || value === '';
+        return item[column].indexOf(value) > -1 || value === '';
       });
     },
     //表示の切り替え
@@ -1954,6 +1969,7 @@ __webpack_require__.r(__webpack_exports__);
     saveTodo: function saveTodo() {
       localStorage.setItem('todos', JSON.stringify(this.todos));
     },
+    //localStorage に保存　（DeleteしたTaskを保存）
     saveCompTask: function saveCompTask() {
       localStorage.setItem('compTask', JSON.stringify(this.compTask));
     },
@@ -1965,6 +1981,7 @@ __webpack_require__.r(__webpack_exports__);
         this.todos = [];
       }
     },
+    //localStorageに保存されている削除履歴（compTaskをリセット）
     resetCompTask: function resetCompTask() {
       localStorage.removeItem('compTask');
       this.loadCompTask();
@@ -48429,7 +48446,7 @@ var render = function() {
             staticClass: "fa fa-pencil-square-o",
             attrs: { "aria-hidden": "true" }
           }),
-          _vm._v(" New Task\n            ")
+          _vm._v(" New Task\n    ")
         ]
       ),
       _vm._v(" "),
@@ -48437,7 +48454,12 @@ var render = function() {
         "button",
         {
           staticClass: "btn btn-danger",
-          staticStyle: { "margin-bottom": "2vh" },
+          staticStyle: {
+            "margin-bottom": "2vh",
+            "background-color": "#E0E0E0",
+            color: "black",
+            "border-color": "#dcdcdc"
+          },
           attrs: { type: "submit" },
           on: {
             click: function($event) {
@@ -48447,14 +48469,14 @@ var render = function() {
         },
         [
           _c("i", { staticClass: "fa fa-btn fa-trash" }),
-          _vm._v("Deleted Task\n            ")
+          _vm._v("Deleted Task\n    ")
         ]
       ),
       _vm._v(" "),
       _vm.open == true
         ? _c("div", { staticClass: "panel panel-default" }, [
             _c("div", { staticClass: "panel-heading" }, [
-              _vm._v("\n                    New Task\n                ")
+              _vm._v("\n        New Task\n      ")
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "panel-body" }, [
@@ -48552,9 +48574,14 @@ var render = function() {
       _vm._v(" "),
       _vm.open == false
         ? _c("div", { staticClass: "panel panel-default" }, [
-            _c("div", { staticClass: "panel-heading" }, [
-              _vm._v("\n                    Seach Task\n                ")
-            ]),
+            _c(
+              "div",
+              {
+                staticClass: "panel-heading",
+                staticStyle: { "background-color": "#E0E0E0" }
+              },
+              [_vm._v("\n        Seach Task\n      ")]
+            ),
             _vm._v(" "),
             _c("div", { staticClass: "panel-body" }, [
               _c(
@@ -48589,85 +48616,152 @@ var render = function() {
                     staticClass: "col-sm-3 control-label",
                     attrs: { for: "task-name" }
                   },
-                  [_vm._v("Task")]
+                  [
+                    _vm._v("Selection  :  "),
+                    _c(
+                      "select",
+                      {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model.trim",
+                            value: _vm.selection,
+                            expression: "selection",
+                            modifiers: { trim: true }
+                          }
+                        ],
+                        attrs: { name: "selection", placeholder: "keyword" },
+                        on: {
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.selection = $event.target.multiple
+                              ? $$selectedVal
+                              : $$selectedVal[0]
+                          }
+                        }
+                      },
+                      [
+                        _c("option", { attrs: { value: "text" } }, [
+                          _vm._v("Task")
+                        ]),
+                        _vm._v(" "),
+                        _c("option", { attrs: { value: "time" } }, [
+                          _vm._v("Time")
+                        ])
+                      ]
+                    )
+                  ]
                 ),
                 _vm._v(" "),
                 _c("div", { staticClass: "col-sm-6" }, [
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model.trim",
-                        value: _vm.keyword,
-                        expression: "keyword",
-                        modifiers: { trim: true }
-                      },
-                      {
-                        name: "validate",
-                        rawName: "v-validate",
-                        value: "max:255",
-                        expression: "'max:255'"
-                      }
-                    ],
-                    staticClass: "form-control",
-                    attrs: {
-                      type: "text",
-                      placeholder: "keyword",
-                      name: "text"
-                    },
-                    domProps: { value: _vm.keyword },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
+                  _vm.selection == "text"
+                    ? _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model.trim",
+                            value: _vm.seachText,
+                            expression: "seachText",
+                            modifiers: { trim: true }
+                          },
+                          {
+                            name: "validate",
+                            rawName: "v-validate",
+                            value: "max:255",
+                            expression: "'max:255'"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "text",
+                          placeholder: "keyword",
+                          name: "text"
+                        },
+                        domProps: { value: _vm.seachText },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.seachText = $event.target.value.trim()
+                          },
+                          blur: function($event) {
+                            return _vm.$forceUpdate()
+                          }
                         }
-                        _vm.keyword = $event.target.value.trim()
-                      },
-                      blur: function($event) {
-                        return _vm.$forceUpdate()
-                      }
-                    }
-                  }),
+                      })
+                    : _vm._e(),
                   _vm._v(" "),
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model.trim",
-                        value: _vm.selection,
-                        expression: "selection",
-                        modifiers: { trim: true }
-                      },
-                      {
-                        name: "validate",
-                        rawName: "v-validate",
-                        value: "max:255",
-                        expression: "'max:255'"
-                      }
-                    ],
-                    staticClass: "form-control",
-                    attrs: {
-                      type: "text",
-                      placeholder: "selection",
-                      name: "text"
-                    },
-                    domProps: { value: _vm.selection },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
+                  _vm.selection == "time"
+                    ? _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model.trim",
+                            value: _vm.seachText,
+                            expression: "seachText",
+                            modifiers: { trim: true }
+                          },
+                          {
+                            name: "validate",
+                            rawName: "v-validate",
+                            value: "max:255",
+                            expression: "'max:255'"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "date",
+                          placeholder: "keyword",
+                          name: "text"
+                        },
+                        domProps: { value: _vm.seachText },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.seachText = $event.target.value.trim()
+                          },
+                          blur: function($event) {
+                            return _vm.$forceUpdate()
+                          }
                         }
-                        _vm.selection = $event.target.value.trim()
-                      },
-                      blur: function($event) {
-                        return _vm.$forceUpdate()
-                      }
-                    }
-                  })
+                      })
+                    : _vm._e()
                 ])
               ]),
               _vm._v(" "),
-              _vm._m(0)
+              _c("div", { staticClass: "form-group" }, [
+                _c("div", { staticClass: "col-sm-offset-3 col-sm-6" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-default",
+                      staticStyle: { "margin-top": "10px" },
+                      attrs: { type: "submit" },
+                      on: { click: _vm.seachTodo }
+                    },
+                    [
+                      _c(
+                        "i",
+                        {
+                          staticClass: "fa fa-search",
+                          attrs: { "aria-hidden": "true" }
+                        },
+                        [_vm._v("Seach Task")]
+                      )
+                    ]
+                  )
+                ])
+              ])
             ])
           ])
         : _vm._e(),
@@ -48675,12 +48769,12 @@ var render = function() {
       _vm.open == true
         ? _c("div", { staticClass: "panel panel-default" }, [
             _c("div", { staticClass: "panel-heading" }, [
-              _vm._v("\n                    Current Tasks\n                ")
+              _vm._v("\n        Current Tasks\n      ")
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "panel-body" }, [
               _c("table", { staticClass: "table table-striped task-table" }, [
-                _vm._m(1),
+                _vm._m(0),
                 _vm._v(" "),
                 _c(
                   "tbody",
@@ -48705,9 +48799,7 @@ var render = function() {
                           },
                           [
                             _c("i", { staticClass: "fa fa-btn fa-trash" }),
-                            _vm._v(
-                              "Delete\n                                    "
-                            )
+                            _vm._v("Delete\n                ")
                           ]
                         )
                       ])
@@ -48722,9 +48814,14 @@ var render = function() {
       _vm._v(" "),
       _vm.open == false
         ? _c("div", { staticClass: "panel panel-default" }, [
-            _c("div", { staticClass: "panel-heading" }, [
-              _vm._v("\n                    Deleted task\n                ")
-            ]),
+            _c(
+              "div",
+              {
+                staticClass: "panel-heading",
+                staticStyle: { "background-color": "#E0E0E0" }
+              },
+              [_vm._v("\n        Deleted task\n      ")]
+            ),
             _vm._v(" "),
             _c("div", { staticClass: "panel-body" }, [
               _c("table", { staticClass: "table table-striped task-table" }, [
@@ -48785,30 +48882,6 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group" }, [
-      _c("div", { staticClass: "col-sm-offset-3 col-sm-6" }, [
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-default",
-            staticStyle: { "margin-top": "10px" },
-            attrs: { type: "submit" }
-          },
-          [
-            _c(
-              "i",
-              { staticClass: "fa fa-search", attrs: { "aria-hidden": "true" } },
-              [_vm._v("Seach Task")]
-            )
-          ]
-        )
-      ])
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
