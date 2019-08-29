@@ -3,12 +3,12 @@
     <div class="col-sm-offset-2 col-sm-8">
 
       <!-- クリック後　New Task 表示 -->
-      <button v-on:click="openDiv()" type="submit" class="btn btn-danger" style="background-color:#f5f5f5; margin-bottom: 2vh; color: black; border-color:#dcdcdc;">
+      <button v-on:click="openDiv()" type="submit" class="btn title" style="background-color:#f5f5f5; margin-bottom: 2vh; color: black; border-color:#dcdcdc;">
         <i class="fa fa-pencil-square-o" aria-hidden="true"></i> New Task
       </button>
 
       <!-- クリック後　Deleted task 表示 -->
-      <button v-on:click="closeDiv()" type="submit" class="btn btn-danger" style="margin-bottom: 2vh; background-color:#E0E0E0; color: black; border-color: #dcdcdc;">
+      <button v-on:click="closeDiv()" type="submit" class="btn title" style="margin-bottom: 2vh; background-color:#E0E0E0; color: black; border-color: #dcdcdc;">
         <i class="fa fa-btn fa-trash"></i>Deleted Task
       </button>
 
@@ -75,10 +75,12 @@
           <!-- SeachTask Form -->
           <!--   -->
           <div class="form-group">
-            <label for="task-name" class="col-sm-3 control-label">Selection&nbsp;&nbsp;:&nbsp;&nbsp;<select name="selection" v-model.trim="selection" placeholder="keyword" >
-              <option value="text">Task</option>
-              <option value="time">Time</option>
-            </select></label>
+            <label for="task-name" class="col-sm-3 control-label">Selection&nbsp;&nbsp;:&nbsp;&nbsp;
+              <select name="selection" v-model.trim="selection" placeholder="keyword" @onclik="resetseachText()">
+                <option value="text">Task</option>
+                <option value="time">Date</option>
+              </select>
+            </label>
             <div class="col-sm-6">
               <!-- validate(255字以内) -->
               <!-- seachするkeywordを指定 -->
@@ -138,9 +140,9 @@
         <div class="panel-body">
           <table class="table table-striped task-table">
             <thead>
-              <th @click="sortBy('text')">Task</th>
+              <th @click="sortBy('text')" class="selection">Task</th>
               <th>&nbsp;</th>
-              <th @click="sortBy('time')">Time</th>
+              <th @click="sortBy('time')" class="selection">Time</th>
             </thead>
             <tbody>
 
@@ -159,6 +161,25 @@
     </div>
   </div>
 </template>
+
+<style>
+.title:hover{
+  opacity: 0.7;
+}
+
+.selection:hover{
+  cursor: pointer;
+}
+
+.selection:active{
+  transform: translateY(0.1875em);
+}
+
+button:active{
+  transform: translateY(0.1875em);
+}
+
+</style>
 
 <script>
   export default {
@@ -189,8 +210,7 @@
       },
     computed: {
       sortedItems () {
-        var item= this.findBy(this.compTask, this.keyword, this.selection);
-        const list = item.slice();  // ソート時でdataの順序を書き換えないため 
+        var list= this.findBy(this.compTask, this.keyword, this.selection); 
         if (this.sort.key) {
           list.sort((a, b) => {
             a = a[this.sort.key]
@@ -223,21 +243,18 @@
         this.saveTodo();
       },
       seachTodo:function(){
-        if(this.selection == 'time'){
-          // input deteの中身が YYYY-MM-DD なので、YYYY/MM/DD に置換する！！正規表現
-          this.keyword = this.seachText.replace(/-/g, '/');
-          this.seachText = '';
-          this,selection = 'text' ;
-        }else{
-          this.keyword = this.seachText;
-          this.seachText = '';
-        }
+        this.$validator.validateAll().then((result) => {
+          if (result) {
+            if(this.selection == 'time'){
+              // input deteの中身が YYYY-MM-DD なので、YYYY/MM/DD に置換する！！ 全体の　- を　/ にするため、正規表現を使用
+              this.keyword = this.seachText.replace(/-/g, '/');
+            }else{
+              this.keyword = this.seachText;
+            }
+          }
+        })
       },
-      //ソート機能
-      sortedClass (key) {
-        return this.sort.key === key ? `sorted ${this.sort.isAsc ? 'asc' : 'desc' }` : '';
-      },
-      //ソート機能
+      //ソート機能 
       sortBy (key) {
         this.sort.isAsc = this.sort.key === key ? !this.sort.isAsc : false;
         this.sort.key = key;
@@ -245,7 +262,7 @@
       //検索機能
       findBy: function (list, value, column) {
         return list.filter(function (item) {
-          // 入力がない場合は全件表示
+          // 入力がない場合は全件表示 valueを含む文字を検索に変更　
           return (item[column].indexOf(value) > -1  || value === '')
          })
         },
@@ -255,6 +272,10 @@
       },
       closeDiv:function(){
         this.open = false ;
+      },
+      //項目の切り替え後　検索ワードをリセット
+      resetseachText:function(){
+        this.seachText = '';
       },
       //localStorage に保存　（オブジェクトや配列はそのままJSONで扱えないので、stringifyでエンコードする。）
       saveTodo: function(){
