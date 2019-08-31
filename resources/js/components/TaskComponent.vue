@@ -81,7 +81,7 @@
                 <option value="time">Date</option>
               </select>
             </label>
-            <div class="col-sm-6">
+            <div class="col-sm-6" style="margin-top: 2vh;">
               <!-- validate(255字以内) -->
               <!-- seachするkeywordを指定 -->
               <input type="text" v-if ="selection == 'text' " v-model.trim="seachText" placeholder="keyword" name="text" v-validate="'max:255'"  class="form-control">
@@ -141,15 +141,14 @@
           <table class="table table-striped task-table">
             <thead>
               <th @click="sortBy('text')" class="selection">Task</th>
-              <th>&nbsp;</th>
               <th @click="sortBy('time')" class="selection">Time</th>
+               <i class="fa fa-refresh" aria-hidden="true" style="float: right;" @click="resetCompTask"></i>
             </thead>
             <tbody>
 
               <!--追加したToDoをforで回す -->
               <tr v-for="item in sortedItems">
                 <td class="table-text">{{item.text}}</td>
-                <td>&nbsp;</td>
                 <td class="table-text"><i class="fa fa-clock-o" aria-hidden="true"></i>{{item.time}}</td>
 
               </tr>
@@ -178,6 +177,16 @@
 button:active{
   transform: translateY(0.1875em);
 }
+
+.fa-refresh:hover{
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.fa-refresh:active{
+  transform: translateY(0.1875em);
+}
+
 
 </style>
 
@@ -292,10 +301,12 @@ button:active{
           this.todos = [];
         } 
       },
-      //localStorageに保存されている削除履歴（compTaskをリセット）
+      //削除履歴のリセット　confirmがokなら削除
       resetCompTask:function(){
-        localStorage.removeItem('compTask');
-        this.loadCompTask();
+        if(window.confirm('履歴のリセットを行います')){
+          localStorage.removeItem('compTask');
+          this.loadCompTask();
+        }
       },
       loadCompTask: function(){
         this.compTask = JSON.parse( localStorage.getItem('compTask') );
