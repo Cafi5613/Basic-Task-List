@@ -191,6 +191,8 @@ button:active{
 </style>
 
 <script>
+  import moment from 'moment';
+ 
   export default {
     data: function() {
       return {
