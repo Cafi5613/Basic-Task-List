@@ -76,7 +76,7 @@
           <!--   -->
           <div class="form-group">
             <label for="task-name" class="col-sm-3 control-label">Selection&nbsp;&nbsp;:&nbsp;&nbsp;
-              <select name="selection" v-model.trim="selection" placeholder="keyword" @onclik="resetseachText()">
+              <select name="selection" v-model.trim="selection" placeholder="keyword" @click="resetseachText()">
                 <option value="text">Task</option>
                 <option value="time">Date</option>
               </select>
