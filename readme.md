@@ -59,7 +59,7 @@ $ cd Basic-Task-List
 ```
 **Composerをインストール。**
 
-`composer install`
+`$ composer install`
 
 **envファイルの作成**
 
