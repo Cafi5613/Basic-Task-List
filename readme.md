@@ -53,9 +53,9 @@ Gitリポジトリのクローンを作成してインストールしてくだ�
 
 
 ```
-git clone https://github.com/Cafi5613/Basic-Task-List.git  
+$ git clone https://github.com/Cafi5613/Basic-Task-List.git  
 
-cd Basic-Task-List  
+$ cd Basic-Task-List  
 ```
 **Composerをインストール。**
 
@@ -64,19 +64,19 @@ cd Basic-Task-List
 **envファイルの作成**
 
 ```
-cp .env.example .env  
+$ cp .env.example .env  
 
-php artisan key:generate  
+$ php artisan key:generate  
 
-php artisan config:clear
+$ php artisan config:clear
 ```   
 **moment.jsのインストール（npm)**
 
-`npm install vue-moment`   
+`$ npm install vue-moment`   
 
 **vee-validate.jsのインストール（npm)**
 
-`npm install vee-validate -S`
+`$ npm install vee-validate -S`
 <br>
 <br>
 
@@ -84,7 +84,7 @@ php artisan config:clear
 
 **vue.jsのビルド**
 
-`npm run dev`
+`$ npm run dev`
 
 **laravelプロジェクトの起動**
 
