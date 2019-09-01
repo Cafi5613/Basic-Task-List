@@ -89,11 +89,11 @@ $ php artisan config:clear
 **laravelプロジェクトの起動**
 
 ```
-＄ cd SampleProject  
+＄ cd Basic-Task-List  
 
-＄ php artisan serveLaravel  
+＄ php artisan serve  
 
-development server started: <http://127.0.0.1:8000>   
+// development server started: <http://127.0.0.1:8000>   
 
 ```
 <br>
