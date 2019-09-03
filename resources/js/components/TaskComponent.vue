@@ -304,17 +304,23 @@ button:active{
         localStorage.setItem(name, JSON.stringify(item));
       },
       //localStorageから　ロードする。前回とは逆にJSONから、parseでデコードする。
-      loadBy(item,name){
-        item = JSON.parse( localStorage.getItem(name) );
-          if( !item ){
-            item = [];
+      loadTodo(){
+        this.todos = JSON.parse( localStorage.getItem('todos') );
+          if( !this.todos ){
+            this.todos = [];
           } 
         },
-      },
-      //プラウザで開いた時にloadTodoしてロードするようにする。
-      mounted(){
-        this.loadBy(this.compTask,'compTask');
-        this.loadBy(this.todos,'todos');
-      },
-    }
+      loadCompTask(){
+      this.compTask = JSON.parse( localStorage.getItem('compTask') );
+        if( !this.compTask ){
+          this.compTask = [];
+        } 
+      }
+    },
+    //プラウザで開いた時にloadして読み込むようにする。
+    mounted(){
+      this.loadTodo();
+      this.loadCompTask();
+    },
+  }
 </script>
